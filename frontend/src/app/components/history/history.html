@@ -1,0 +1,91 @@
+<div class="container history-wrapper">
+  <!-- Header / Navigation -->
+  <header class="history-header">
+    <button class="btn btn-secondary back-btn" routerLink="/dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Dashboard
+    </button>
+    <h2>Transaction History</h2>
+  </header>
+
+  <!-- Error Alerts -->
+  <div *ngIf="errorMessage()" class="alert alert-danger">
+    <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span>{{ errorMessage() }}</span>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading audit trail...</p>
+  </div>
+
+  <!-- Main Table Card -->
+  <div class="glass-card table-card" *ngIf="!isLoading()">
+    <!-- Empty State -->
+    <div *ngIf="transactions().length === 0" class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="empty-icon">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="8" y1="12" x2="16" y2="12"></line>
+      </svg>
+      <p>No transactions found for this account.</p>
+    </div>
+
+    <!-- Transaction Table -->
+    <div class="table-responsive" *ngIf="transactions().length > 0">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>DATE & TIME</th>
+            <th>TRANSACTION ID</th>
+            <th>COUNTERPARTY</th>
+            <th>DIRECTION</th>
+            <th>AMOUNT</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tx of transactions()" class="table-row">
+            <td>
+              <span class="tx-date">{{ tx.createdOn | date:'mediumDate' }}</span>
+              <span class="tx-time">{{ tx.createdOn | date:'shortTime' }}</span>
+            </td>
+            <td class="tx-id" [title]="tx.id">
+              <code>{{ tx.id.substring(0, 8) }}...</code>
+            </td>
+            <td>
+              <span *ngIf="isDebit(tx)">To ACC-00{{ tx.toAccountId }}</span>
+              <span *ngIf="!isDebit(tx)">From ACC-00{{ tx.fromAccountId }}</span>
+            </td>
+            <td>
+              <span class="direction-badge" [ngClass]="isDebit(tx) ? 'debit' : 'credit'">
+                {{ isDebit(tx) ? 'DEBIT' : 'CREDIT' }}
+              </span>
+            </td>
+            <td class="tx-amount" [ngClass]="isDebit(tx) ? 'debit-text' : 'credit-text'">
+              {{ isDebit(tx) ? '-' : '+' }} ${{ tx.amount | number:'1.2-2' }}
+            </td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'badge-success': tx.status === 'SUCCESS',
+                'badge-danger': tx.status === 'FAILED'
+              }" [title]="tx.failureReason || ''">
+                {{ tx.status }}
+              </span>
+              <div class="failure-reason-hint" *ngIf="tx.status === 'FAILED' && tx.failureReason">
+                ⚠️ {{ tx.failureReason }}
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

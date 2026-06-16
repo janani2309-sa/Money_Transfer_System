@@ -1,0 +1,141 @@
+<div class="container transfer-wrapper">
+  <!-- Header / Navigation -->
+  <header class="transfer-header">
+    <button class="btn btn-secondary back-btn" routerLink="/dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Dashboard
+    </button>
+    <h2>Fund Transfer</h2>
+  </header>
+
+  <!-- Alerts -->
+  <div *ngIf="errorMessage()" class="alert alert-danger">
+    <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span>{{ errorMessage() }}</span>
+  </div>
+
+  <div *ngIf="successMessage()" class="alert alert-success">
+    <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span>{{ successMessage() }}</span>
+  </div>
+
+  <!-- Main Card -->
+  <div class="glass-card transfer-card">
+    <div *ngIf="isFetchingAccount()" class="loading-state">
+      <div class="spinner"></div>
+      <p>Synchronizing secure session...</p>
+    </div>
+
+    <form *ngIf="!isFetchingAccount()" (ngSubmit)="onSubmit()" #transferForm="ngForm">
+      <!-- Readonly Source Account Details -->
+      <div class="form-group source-details">
+        <label>DEBIT FROM</label>
+        <div class="source-info-box">
+          <span class="source-name">{{ sourceAccount()?.holderName }}</span>
+          <span class="source-meta">Account: ACC-00{{ sourceAccount()?.id }} | Balance: <strong>${{ sourceAccount()?.balance | number:'1.2-2' }}</strong></span>
+        </div>
+      </div>
+
+      <!-- Destination Account Input -->
+      <div class="form-group">
+        <label for="toAccountId">CREDIT TO (ACCOUNT ID)</label>
+        <input
+          type="text"
+          id="toAccountId"
+          name="toAccountId"
+          class="input-field"
+          placeholder="Enter destination account ID"
+          [(ngModel)]="toAccountId"
+          required
+          #destInput="ngModel"
+          [disabled]="isLoading()"
+        />
+        <div *ngIf="destInput.touched && destInput.invalid" class="validation-error">
+          Destination account ID is required.
+        </div>
+      </div>
+
+      <!-- Amount Input -->
+      <div class="form-group">
+        <label for="amount">AMOUNT ($)</label>
+        <input
+          type="number"
+          id="amount"
+          name="amount"
+          class="input-field"
+          placeholder="0.00"
+          [(ngModel)]="amount"
+          required
+          min="0.01"
+          step="0.01"
+          #amountInput="ngModel"
+          [disabled]="isLoading()"
+        />
+        <div *ngIf="amountInput.touched && amountInput.invalid" class="validation-error">
+          <span *ngIf="amountInput.errors?.['required']">Amount is required.</span>
+          <span *ngIf="amountInput.errors?.['min']">Amount must be greater than zero.</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary submit-btn"
+          [disabled]="transferForm.invalid || isLoading()"
+        >
+          <span *ngIf="!isLoading()">Initiate Transfer</span>
+          <div *ngIf="isLoading()" class="spinner"></div>
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Confirmation Modal Overlay -->
+  <div class="modal-overlay" *ngIf="showConfirmation()">
+    <div class="glass-card modal-card">
+      <div class="modal-header">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="warning-icon">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <h3>Confirm Transfer</h3>
+      </div>
+      
+      <div class="modal-body">
+        <p class="warning-text">Are you sure you want to execute this fund transfer? This action is irreversible.</p>
+        
+        <div class="transfer-details-summary">
+          <div class="summary-row">
+            <span class="summary-label">Debit Source:</span>
+            <span class="summary-value">{{ sourceAccount()?.holderName }} (ACC-00{{ sourceAccount()?.id }})</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Credit Destination:</span>
+            <span class="summary-value">Account ID: {{ toAccountId }}</span>
+          </div>
+          <div class="summary-row highlight">
+            <span class="summary-label font-bold">Transfer Amount:</span>
+            <span class="summary-value font-bold text-indigo">${{ amount | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cancelTransfer()">Cancel</button>
+        <button class="btn btn-primary" (click)="confirmTransfer()">Confirm & Execute</button>
+      </div>
+    </div>
+  </div>
+</div>

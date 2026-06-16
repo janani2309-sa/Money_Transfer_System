@@ -1,0 +1,113 @@
+<div class="container dashboard-wrapper">
+  <!-- Top Navigation Header -->
+  <header class="dashboard-header glass-card">
+    <div class="brand">
+      <svg class="header-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+      </svg>
+      <span class="brand-text">AURA BANK</span>
+    </div>
+    <div class="user-actions">
+      <span class="welcome-user" *ngIf="account()">Welcome, <strong>{{ account()?.holderName }}</strong></span>
+      <button class="btn btn-secondary logout-btn" (click)="logout()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Sign Out
+      </button>
+    </div>
+  </header>
+
+  <!-- Error Alerts -->
+  <div *ngIf="errorMessage()" class="alert alert-danger">
+    <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span>{{ errorMessage() }}</span>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <div class="spinner-large"></div>
+    <p>Retrieving your secure dashboard...</p>
+  </div>
+
+  <!-- Main Content -->
+  <main class="dashboard-content" *ngIf="!isLoading() && account()">
+    <div class="grid-layout">
+      <!-- Balance Card -->
+      <section class="glass-card balance-card">
+        <div class="balance-header">
+          <span class="card-label">AVAILABLE BALANCE</span>
+          <span class="badge" [ngClass]="{
+            'badge-success': account()?.status === 'ACTIVE',
+            'badge-danger': account()?.status !== 'ACTIVE'
+          }">{{ account()?.status }}</span>
+        </div>
+        <div class="balance-value">
+          <span class="currency-symbol">$</span>
+          <span class="amount-whole">{{ account()?.balance | number:'1.2-2' }}</span>
+        </div>
+        <div class="account-meta">
+          <div class="meta-item">
+            <span class="meta-label">Account Number</span>
+            <span class="meta-value">ACC-00{{ account()?.id }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Last Updated</span>
+            <span class="meta-value">{{ account()?.lastUpdated | date:'medium' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Action Cards -->
+      <section class="actions-section">
+        <div class="action-card glass-card" routerLink="/transfer">
+          <div class="action-icon-wrapper transfer-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="17" y1="10" x2="3" y2="10"></line>
+              <polyline points="12 5 17 10 12 15"></polyline>
+              <line x1="7" y1="14" x2="21" y2="14"></line>
+              <polyline points="12 19 7 14 12 9"></polyline>
+            </svg>
+          </div>
+          <div class="action-details">
+            <h3>Send Money</h3>
+            <p>Transfer funds securely to any account instantly.</p>
+          </div>
+          <div class="action-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <div class="action-card glass-card" routerLink="/history">
+          <div class="action-icon-wrapper history-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 8v4l3 3"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+              <path d="M21 3v5h-5"></path>
+            </svg>
+          </div>
+          <div class="action-details">
+            <h3>Transaction Logs</h3>
+            <p>Monitor your statement history and transfer audit trail.</p>
+          </div>
+          <div class="action-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,74 @@
+<div class="login-wrapper">
+  <div class="glass-card login-card">
+    <div class="brand">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+      </div>
+      <h2>AURA DIGITAL</h2>
+      <p class="subtitle">Secure Enterprise Money Transfer</p>
+    </div>
+
+    <!-- Error message alert -->
+    <div *ngIf="errorMessage()" class="alert alert-danger">
+      <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm" autocomplete="off">
+      <div class="form-group">
+        <label for="username">ACCOUNT ID / USERNAME</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          class="input-field"
+          placeholder="e.g. janani, admin, or Account ID"
+          [(ngModel)]="username"
+          required
+          #usernameInput="ngModel"
+          [disabled]="isLoading()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">PASSWORD</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="input-field"
+          placeholder="••••••••"
+          [(ngModel)]="password"
+          required
+          #passwordInput="ngModel"
+          [disabled]="isLoading()"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary login-btn"
+        [disabled]="loginForm.invalid || isLoading()"
+      >
+        <span *ngIf="!isLoading()">Sign In Securely</span>
+        <div *ngIf="isLoading()" class="spinner"></div>
+      </button>
+    </form>
+
+    <div class="creds-help">
+      <p>💡 <strong>Demo Credentials:</strong></p>
+      <ul>
+        <li>User: <code>janani</code> / Pass: <code>Janani23092004</code> (Account ID: 1)</li>
+        <li>Admin: <code>admin</code> / Pass: <code>admin123</code> (Account ID: 3)</li>
+      </ul>
+    </div>
+  </div>
+</div>
