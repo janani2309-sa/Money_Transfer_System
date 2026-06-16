@@ -90,7 +90,7 @@ export class TransferComponent implements OnInit {
     }
 
     if (source && source.balance < amt) {
-      this.errorMessage.set(`Insufficient funds. Your available balance is $${source.balance.toFixed(2)}.`);
+      this.errorMessage.set(`Insufficient funds. Your available balance is Rs. ${source.balance.toFixed(2)}.`);
       return;
     }
 
@@ -117,7 +117,7 @@ export class TransferComponent implements OnInit {
     this.transferService.transfer(payload).subscribe({
       next: (response) => {
         this.isLoading.set(false);
-        this.successMessage.set(`Transfer of $${payload.amount.toFixed(2)} completed successfully!`);
+        this.successMessage.set(`Transfer of Rs. ${payload.amount.toFixed(2)} completed successfully!`);
         
         // Reset form inputs
         this.toAccountId = '';
