@@ -42,7 +42,7 @@
         <label>DEBIT FROM</label>
         <div class="source-info-box">
           <span class="source-name">{{ sourceAccount()?.holderName }}</span>
-          <span class="source-meta">Account: ACC-00{{ sourceAccount()?.id }} | Balance: <strong>${{ sourceAccount()?.balance | number:'1.2-2' }}</strong></span>
+          <span class="source-meta">Account: ACC-00{{ sourceAccount()?.id }} | Balance: <strong>Rs. {{ sourceAccount()?.balance | number:'1.2-2' }}</strong></span>
         </div>
       </div>
 
@@ -67,7 +67,7 @@
 
       <!-- Amount Input -->
       <div class="form-group">
-        <label for="amount">AMOUNT ($)</label>
+        <label for="amount">AMOUNT (Rs.)</label>
         <input
           type="number"
           id="amount"
@@ -127,7 +127,7 @@
           </div>
           <div class="summary-row highlight">
             <span class="summary-label font-bold">Transfer Amount:</span>
-            <span class="summary-value font-bold text-indigo">${{ amount | number:'1.2-2' }}</span>
+            <span class="summary-value font-bold text-indigo">Rs. {{ amount | number:'1.2-2' }}</span>
           </div>
         </div>
       </div>

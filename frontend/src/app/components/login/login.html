@@ -8,7 +8,7 @@
           <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
         </svg>
       </div>
-      <h2>AURA DIGITAL</h2>
+      <h2>4You Bank</h2>
       <p class="subtitle">Secure Enterprise Money Transfer</p>
     </div>
 
@@ -33,9 +33,14 @@
           placeholder="e.g. janani, admin, or Account ID"
           [(ngModel)]="username"
           required
+          pattern="^[a-zA-Z0-9]+$"
           #usernameInput="ngModel"
           [disabled]="isLoading()"
         />
+        <div *ngIf="usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)" class="validation-error">
+          <span *ngIf="usernameInput.errors?.['required']">Username is required.</span>
+          <span *ngIf="usernameInput.errors?.['pattern']">Username must be alphanumeric with no special characters.</span>
+        </div>
       </div>
 
       <div class="form-group">
@@ -48,9 +53,14 @@
           placeholder="••••••••"
           [(ngModel)]="password"
           required
+          pattern="^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]{8,15}$"
           #passwordInput="ngModel"
           [disabled]="isLoading()"
         />
+        <div *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)" class="validation-error">
+          <span *ngIf="passwordInput.errors?.['required']">Password is required.</span>
+          <span *ngIf="passwordInput.errors?.['pattern']">Password must contain alphanumeric/special characters and be between 8 and 15 characters.</span>
+        </div>
       </div>
 
       <button
