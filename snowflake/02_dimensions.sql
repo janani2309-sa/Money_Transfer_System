@@ -1,9 +1,7 @@
--- Snowflake Dimensions Definition
-
 USE DATABASE MONEY_TRANSFER_DW;
 USE SCHEMA ANALYTICS;
 
--- Create Account Dimension Table
+-- Account Dimension Table
 CREATE OR REPLACE TABLE DIM_ACCOUNT (
     account_key NUMBER IDENTITY(1,1) PRIMARY KEY,
     account_id NUMBER NOT NULL,
@@ -12,7 +10,7 @@ CREATE OR REPLACE TABLE DIM_ACCOUNT (
     effective_date DATE DEFAULT CURRENT_DATE()
 );
 
--- Create Date Dimension Table
+-- Date Dimension Table
 CREATE OR REPLACE TABLE DIM_DATE (
     date_key NUMBER PRIMARY KEY, -- YYYYMMDD
     full_date DATE NOT NULL,
