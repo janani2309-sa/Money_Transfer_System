@@ -1,9 +1,7 @@
--- Snowflake Fact Table Definition
-
 USE DATABASE MONEY_TRANSFER_DW;
 USE SCHEMA ANALYTICS;
 
--- Create Fact Transactions Table
+-- Fact Transactions Table
 CREATE OR REPLACE TABLE FACT_TRANSACTIONS (
     transaction_key NUMBER IDENTITY(1,1) PRIMARY KEY,
     account_from_key NUMBER FOREIGN KEY REFERENCES DIM_ACCOUNT(account_key),
