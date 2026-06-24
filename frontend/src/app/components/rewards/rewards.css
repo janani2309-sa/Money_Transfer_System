@@ -1,0 +1,696 @@
+.rewards-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1000px !important;
+  margin: 0 auto;
+}
+
+.rewards-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.back-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Balance Card layout */
+.reward-balance-card {
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(20, 24, 33, 0.6) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  box-shadow: 0 8px 32px 0 rgba(255, 215, 0, 0.08);
+}
+
+.reward-card-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+@media (max-width: 600px) {
+  .reward-card-content {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.icon-trophy-wrapper {
+  width: 90px;
+  height: 90px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(218, 165, 32, 0.4);
+  animation: floatReward 4s ease-in-out infinite;
+}
+
+.trophy-icon {
+  width: 44px;
+  height: 44px;
+  color: #0b0c10;
+}
+
+.balance-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.card-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.balance-points {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.points-value {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #ffd700;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  line-height: 1;
+}
+
+.points-label {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.balance-description {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* History Log Section */
+.history-section {
+  padding: 2rem;
+}
+
+.history-section .card-header {
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.rewards-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.rewards-table th,
+.rewards-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.rewards-table th {
+  background: rgba(255, 255, 255, 0.02);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.rewards-table tr:last-child td {
+  border-bottom: none;
+}
+
+.rewards-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.date-cell {
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.points-cell {
+  font-weight: 700;
+}
+
+.points-badge {
+  background: rgba(255, 215, 0, 0.1);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  padding: 0.3rem 0.65rem;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  display: inline-block;
+}
+
+.amount-cell {
+  font-family: monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.tx-id-cell {
+  font-family: monospace;
+}
+
+.tx-id-code {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--text-main);
+}
+
+/* Empty State Styling */
+.no-rewards-placeholder {
+  text-align: center;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.sparkles-icon {
+  width: 64px;
+  height: 64px;
+  color: rgba(255, 215, 0, 0.4);
+  margin-bottom: 0.5rem;
+}
+
+.sparkles-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.no-rewards-placeholder .main-msg {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.no-rewards-placeholder .sub-msg {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0 0 1.5rem 0;
+}
+
+.send-btn {
+  padding: 0.65rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Floating animation for trophy */
+@keyframes floatReward {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Light Theme Responsiveness Overrides */
+.light-theme .reward-balance-card {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 255, 255, 0.75) 100%);
+  border-color: rgba(181, 126, 44, 0.35);
+  box-shadow: 0 8px 32px rgba(181, 126, 44, 0.06);
+}
+
+.light-theme .points-value {
+  color: var(--secondary);
+  text-shadow: none;
+}
+
+.light-theme .points-badge {
+  background: rgba(181, 126, 44, 0.08);
+  color: var(--secondary);
+  border-color: rgba(181, 126, 44, 0.25);
+}
+
+.light-theme .rewards-table th {
+  background: rgba(0, 111, 185, 0.04);
+}
+
+.light-theme .tx-id-code {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-main);
+}
+
+.light-theme .sparkles-icon {
+  color: rgba(181, 126, 44, 0.6);
+}
+
+/* Redeem section grids and styling */
+.redeem-section {
+  padding: 2rem;
+}
+
+.section-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+.scratch-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.scratch-card-item {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.scratch-card-item:hover:not(.locked) {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.silver-tier {
+  border-color: rgba(211, 211, 211, 0.2);
+}
+.silver-tier:hover:not(.locked) {
+  border-color: rgba(211, 211, 211, 0.4);
+  box-shadow: 0 10px 25px rgba(211, 211, 211, 0.08);
+}
+
+.gold-tier {
+  border-color: rgba(255, 215, 0, 0.2);
+}
+.gold-tier:hover:not(.locked) {
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 10px 25px rgba(255, 215, 0, 0.08);
+}
+
+.card-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 16px;
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.05), transparent 60%);
+  pointer-events: none;
+}
+
+.silver-tier .card-glow {
+  background: radial-gradient(circle at top left, rgba(211, 211, 211, 0.08), transparent 60%);
+}
+.gold-tier .card-glow {
+  background: radial-gradient(circle at top left, rgba(255, 215, 0, 0.08), transparent 60%);
+}
+
+.card-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  z-index: 1;
+  flex: 1;
+}
+
+.card-icon-badge {
+  font-size: 2.25rem;
+  margin-bottom: 0.75rem;
+  align-self: flex-start;
+}
+
+.card-inner h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+
+.card-cost {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0 0 0.75rem 0;
+}
+
+.silver-tier .card-cost {
+  color: #d3d3d3;
+}
+.gold-tier .card-cost {
+  color: #ffd700;
+}
+
+.card-reward-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0 0 1.5rem 0;
+  flex: 1;
+}
+
+.btn-scratch {
+  width: 100%;
+  padding: 0.65rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+}
+
+.silver-tier .btn-scratch:hover:not(:disabled) {
+  background: #d3d3d3;
+  color: #0b0c10;
+  border-color: #d3d3d3;
+}
+.gold-tier .btn-scratch:hover:not(:disabled) {
+  background: #ffd700;
+  color: #0b0c10;
+  border-color: #ffd700;
+}
+
+/* Locked Card overlay details */
+.scratch-card-item.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.scratch-card-item.locked .btn-scratch {
+  background: rgba(255, 255, 255, 0.02) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--glass-border) !important;
+  cursor: not-allowed;
+}
+
+/* Modal Overlay styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+}
+
+.modal-container {
+  width: 100%;
+  max-width: 400px;
+  background: #141821;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  padding: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.modal-header h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.btn-close:hover {
+  color: var(--text-main);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.scratch-area-wrapper {
+  position: relative;
+  width: 300px;
+  height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  background: #0f121a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.scratch-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  cursor: crosshair;
+  touch-action: none;
+  transition: opacity 0.5s ease;
+}
+
+/* Revealed Reward Styles */
+.revealed-reward-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(20, 24, 33, 0.9) 100%);
+}
+
+.revealed-reward-content.visible {
+  opacity: 1;
+  z-index: 11;
+}
+
+.gift-icon-wrapper {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  animation: floatReward 2s ease-in-out infinite;
+}
+
+.gift-icon-wrapper.pulse {
+  animation: pulseGift 1s infinite alternate;
+}
+
+@keyframes pulseGift {
+  from {
+    transform: scale(1);
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.2));
+  }
+  to {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+  }
+}
+
+.prize-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.congrats-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #ffd700;
+}
+
+.prize-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.prize-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.prize-loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner-small {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #ffd700;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.prize-loading-spinner p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.scratch-instructions {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+  text-align: center;
+  max-width: 260px;
+}
+
+.modal-action-btn {
+  width: 100%;
+  padding: 0.65rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Redemptions Table */
+.points-badge-spent {
+  background: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  padding: 0.3rem 0.65rem;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  display: inline-block;
+}
+
+.status-badge-claimed {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.3);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Light theme overrides for scratch card elements */
+.light-theme .scratch-card-item {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.03) 100%);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light-theme .scratch-card-item.locked {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light-theme .btn-scratch {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--text-main);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light-theme .modal-container {
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.light-theme .scratch-area-wrapper {
+  background: #f8f9fa;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.light-theme .revealed-reward-content {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+.light-theme .points-badge-spent {
+  background: rgba(220, 53, 69, 0.06);
+}
+
+.light-theme .status-badge-claimed {
+  background: rgba(40, 167, 69, 0.06);
+}
+

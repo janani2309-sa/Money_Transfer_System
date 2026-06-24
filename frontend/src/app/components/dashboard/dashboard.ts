@@ -1,16 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth.service';
-import { AccountService } from '../../services/account.service';
-
-export interface AccountData {
-  id: number;
-  holderName: string;
-  balance: number;
-  status: string;
-  lastUpdated: string;
-}
+import { AuthService, AccountDetails } from '../../services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,43 +11,56 @@ export interface AccountData {
   styleUrl: './dashboard.css',
 })
 export class DashboardComponent implements OnInit {
-  account = signal<AccountData | null>(null);
   isLoading = signal<boolean>(true);
-  errorMessage = signal<string | null>(null);
+
+
+  // Expose auth service signals to template
+  userProfile: any;
+  activeAccount: any;
 
   constructor(
     private authService: AuthService,
-    private accountService: AccountService,
     private router: Router
-  ) {}
+  ) {
+    this.userProfile = this.authService.userProfile;
+    this.activeAccount = this.authService.activeAccount;
+  }
 
   ngOnInit(): void {
-    const accountId = this.authService.currentAccountId();
-    if (!accountId) {
-      this.errorMessage.set('No active session. Please log in.');
+    if (!this.authService.isAuthenticated()) {
+      this.authService.showToast('No active session. Please log in.', 'danger');
       this.isLoading.set(false);
       this.router.navigate(['/login']);
       return;
     }
 
-    this.fetchAccountDetails(accountId);
+    this.refreshDashboard();
   }
 
-  fetchAccountDetails(id: number): void {
+  refreshDashboard(): void {
     this.isLoading.set(true);
-    this.errorMessage.set(null);
-
-    this.accountService.getAccount(id).subscribe({
-      next: (data: AccountData) => {
-        this.account.set(data);
+    this.authService.refreshProfile().subscribe({
+      next: (profile) => {
         this.isLoading.set(false);
+        if (!profile || !profile.accounts || profile.accounts.length === 0) {
+          this.router.navigate(['/create-account']);
+        }
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set('Failed to load account details. Please retry.');
+        this.authService.showToast('Failed to load dashboard data. Check database.', 'danger');
         console.error(err);
       },
     });
+  }
+
+  switchAccount(accountNumber: string): void {
+    this.authService.setActiveAccount(accountNumber);
+  }
+
+  hasFewerThanThreeAccounts(): boolean {
+    const profile = this.userProfile();
+    return profile ? profile.accounts.length < 3 : false;
   }
 
   logout(): void {

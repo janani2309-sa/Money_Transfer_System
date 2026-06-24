@@ -15,10 +15,7 @@ public class LoggingAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    /**
-     * Intercepts execution of all methods in service and controller packages.
-     * Logs method entry, arguments, exit, return value, and execution time.
-     */
+
     @Around("execution(* com.banking.moneytransfer.service..*(..)) || execution(* com.banking.moneytransfer.controller..*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getTarget().getClass().getSimpleName();

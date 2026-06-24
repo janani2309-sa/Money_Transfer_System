@@ -6,7 +6,7 @@ public record TransferResponse(
         String transactionId,
         String status,
         String message,
-        Long debitedFrom,
-        Long creditedTo,
+        String debitedFrom,
+        String creditedTo,
         BigDecimal amount
 ) {}

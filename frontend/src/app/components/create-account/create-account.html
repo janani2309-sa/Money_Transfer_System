@@ -1,0 +1,120 @@
+<div class="create-account-wrapper">
+  <div class="glass-card create-account-card animate-fade-in">
+    <div class="brand">
+      <div class="logo-icon">
+        <img src="/apexpay_logo.png" alt="ApexPay Logo" class="brand-logo-img" />
+      </div>
+      <h2>Open Transfer Account</h2>
+      <p class="subtitle">Select account type and complete documentation</p>
+    </div>
+
+
+
+    <form *ngIf="availableTypes().length > 0" (ngSubmit)="onSubmit()" #accountForm="ngForm" autocomplete="off">
+      <div class="form-group">
+        <label for="accountType">ACCOUNT TYPE</label>
+        <select
+          id="accountType"
+          name="accountType"
+          class="input-field select-field"
+          [(ngModel)]="accountType"
+          required
+          [disabled]="isLoading()"
+        >
+          <option *ngFor="let type of availableTypes()" [value]="type">{{ type }}</option>
+        </select>
+        <p class="help-text">
+          * Maximum allowed accounts: 1 Savings, 1 Business, 1 Salary account.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="initialDeposit">INITIAL DEPOSIT (INR)</label>
+        <input
+          type="number"
+          id="initialDeposit"
+          name="initialDeposit"
+          class="input-field"
+          placeholder="e.g. 1000"
+          [(ngModel)]="initialDeposit"
+          required
+          min="1000"
+          max="10000000"
+          #depositInput="ngModel"
+          [disabled]="isLoading()"
+        />
+        <div *ngIf="depositInput.invalid && (depositInput.dirty || depositInput.touched)" class="validation-error">
+          <span>Initial deposit must be between 1,000 Rs. and 10,000,000 Rs.</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col">
+          <label for="documentType">KYC DOCUMENT TYPE</label>
+          <select
+            id="documentType"
+            name="documentType"
+            class="input-field select-field"
+            [(ngModel)]="documentType"
+            required
+            [disabled]="isLoading()"
+          >
+            <option value="PAN_CARD">PAN Card</option>
+            <option value="AADHAAR_CARD">Aadhaar Card</option>
+            <option value="PASSPORT">Passport</option>
+            <option value="VOTER_ID">Voter ID</option>
+          </select>
+        </div>
+
+        <div class="form-group col">
+          <label for="documentNumber">DOCUMENT NUMBER</label>
+          <input
+            type="text"
+            id="documentNumber"
+            name="documentNumber"
+            class="input-field"
+            placeholder="Enter ID Number"
+            [(ngModel)]="documentNumber"
+            required
+            #docNumInput="ngModel"
+            [disabled]="isLoading()"
+          />
+        </div>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label class="checkbox-container">
+          <input
+            type="checkbox"
+            name="agreedToTerms"
+            [(ngModel)]="agreedToTerms"
+            required
+            [disabled]="isLoading()"
+          />
+          <span class="checkmark"></span>
+          <span class="checkbox-label">I certify that the KYC information is true and agree to open this account.</span>
+        </label>
+      </div>
+
+      <div class="action-buttons">
+        <button
+          type="submit"
+          class="btn btn-primary submit-btn"
+          [disabled]="accountForm.invalid || isLoading()"
+        >
+          <span *ngIf="!isLoading()">Open Account</span>
+          <div *ngIf="isLoading()" class="spinner"></div>
+        </button>
+
+        <a routerLink="/dashboard" class="btn btn-secondary cancel-btn" [style.pointer-events]="isLoading() ? 'none' : 'auto'">
+          Cancel
+        </a>
+      </div>
+    </form>
+
+    <div *ngIf="availableTypes().length === 0" class="no-options-message">
+      <p>You have already opened the maximum permissible number of accounts (Savings, Business, and Salary).</p>
+      <a routerLink="/dashboard" class="btn btn-primary return-btn">Return to Dashboard</a>
+    </div>
+  </div>
+</div>

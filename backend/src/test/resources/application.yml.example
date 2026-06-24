@@ -1,0 +1,40 @@
+server:
+  port: 8080
+  error:
+    include-message: always
+
+spring:
+  application:
+    name: money-transfer-system
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/money_transfer_db_test?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: YOUR_DATABASE_PASSWORD_HERE
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: YOUR_GMAIL_USERNAME_HERE
+    password: YOUR_GMAIL_APP_PASSWORD_HERE
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  sql:
+    init:
+      mode: never

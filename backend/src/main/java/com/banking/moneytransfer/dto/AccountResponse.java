@@ -6,8 +6,13 @@ import java.time.LocalDateTime;
 
 public record AccountResponse(
         Long id,
-        String holderName,
+        String accountNumber,
+        com.banking.moneytransfer.domain.AccountType accountType,
+        String firstName,
+        String lastName,
         BigDecimal balance,
         AccountStatus status,
-        LocalDateTime lastUpdated
+        LocalDateTime openedDate,
+        LocalDateTime lastUpdated,
+        String closureReason
 ) {}

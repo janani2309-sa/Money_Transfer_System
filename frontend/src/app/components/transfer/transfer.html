@@ -11,24 +11,6 @@
     <h2>Fund Transfer</h2>
   </header>
 
-  <!-- Alerts -->
-  <div *ngIf="errorMessage()" class="alert alert-danger">
-    <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"></circle>
-      <line x1="12" y1="8" x2="12" y2="12"></line>
-      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-    </svg>
-    <span>{{ errorMessage() }}</span>
-  </div>
-
-  <div *ngIf="successMessage()" class="alert alert-success">
-    <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-    </svg>
-    <span>{{ successMessage() }}</span>
-  </div>
-
   <!-- Main Card -->
   <div class="glass-card transfer-card">
     <div *ngIf="isFetchingAccount()" class="loading-state">
@@ -37,31 +19,69 @@
     </div>
 
     <form *ngIf="!isFetchingAccount()" (ngSubmit)="onSubmit()" #transferForm="ngForm">
-      <!-- Readonly Source Account Details -->
+      <!-- Selectable Source Account Details -->
       <div class="form-group source-details">
-        <label>DEBIT FROM</label>
-        <div class="source-info-box">
-          <span class="source-name">{{ sourceAccount()?.holderName }}</span>
-          <span class="source-meta">Account: ACC-00{{ sourceAccount()?.id }} | Balance: <strong>Rs. {{ sourceAccount()?.balance | number:'1.2-2' }}</strong></span>
+        <label for="sourceAccountSelect">DEBIT FROM</label>
+        <select 
+          id="sourceAccountSelect" 
+          name="sourceAccountSelect" 
+          class="input-field select-field" 
+          [ngModel]="sourceAccount()?.accountNumber"
+          (ngModelChange)="onSourceAccountChange($event)"
+          [disabled]="isLoading()"
+          required
+        >
+          <option *ngFor="let acc of userProfile()?.accounts" [value]="acc.accountNumber" [disabled]="acc.status !== 'ACTIVE'">
+            {{ acc.accountType }} - {{ acc.accountNumber }} (Rs. {{ acc.balance | number:'1.2-2' }})
+          </option>
+        </select>
+        <!-- Display balance indicator for visual reinforcement -->
+        <div class="recipient-feedback" *ngIf="sourceAccount()">
+          <div class="feedback-info">
+            Available Balance: <strong class="text-indigo">Rs. {{ sourceAccount()?.balance | number:'1.2-2' }}</strong>
+          </div>
         </div>
       </div>
 
       <!-- Destination Account Input -->
       <div class="form-group">
-        <label for="toAccountId">CREDIT TO (ACCOUNT ID)</label>
+        <label for="toAccountNumber">CREDIT TO (ACCOUNT NUMBER)</label>
         <input
           type="text"
-          id="toAccountId"
-          name="toAccountId"
+          id="toAccountNumber"
+          name="toAccountNumber"
           class="input-field"
-          placeholder="Enter destination account ID"
-          [(ngModel)]="toAccountId"
+          placeholder="Enter destination account number (e.g. APXAC00002)"
+          [ngModel]="toAccountNumber"
+          (ngModelChange)="onToAccountChange($event)"
           required
           #destInput="ngModel"
           [disabled]="isLoading()"
         />
+        
+        <!-- Recipient Verification Feedback Alerts -->
+        <div class="recipient-feedback">
+          <div *ngIf="isVerifyingRecipient()" class="feedback-info">
+            <span class="spinner-small"></span> Verifying account number...
+          </div>
+          <div *ngIf="isRecipientValid() && recipientName()" class="feedback-success">
+            <svg class="feedback-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Recipient: <strong>{{ recipientName() }}</strong></span>
+          </div>
+          <div *ngIf="toAccountNumber.trim().length >= 5 && !isRecipientValid() && !isVerifyingRecipient()" class="feedback-danger">
+            <svg class="feedback-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+            <span>Invalid recipient account number</span>
+          </div>
+        </div>
+
         <div *ngIf="destInput.touched && destInput.invalid" class="validation-error">
-          Destination account ID is required.
+          Destination account number is required.
         </div>
       </div>
 
@@ -69,21 +89,20 @@
       <div class="form-group">
         <label for="amount">AMOUNT (Rs.)</label>
         <input
-          type="number"
+          type="text"
           id="amount"
           name="amount"
           class="input-field"
           placeholder="0.00"
-          [(ngModel)]="amount"
+          [ngModel]="amount"
+          (keypress)="onAmountKeyPress($event)"
+          (input)="onAmountInput($event)"
           required
-          min="0.01"
-          step="0.01"
           #amountInput="ngModel"
           [disabled]="isLoading()"
         />
         <div *ngIf="amountInput.touched && amountInput.invalid" class="validation-error">
-          <span *ngIf="amountInput.errors?.['required']">Amount is required.</span>
-          <span *ngIf="amountInput.errors?.['min']">Amount must be greater than zero.</span>
+          <span>Amount is required.</span>
         </div>
       </div>
 
@@ -92,7 +111,7 @@
         <button
           type="submit"
           class="btn btn-primary submit-btn"
-          [disabled]="transferForm.invalid || isLoading()"
+          [disabled]="transferForm.invalid || isLoading() || !isRecipientValid()"
         >
           <span *ngIf="!isLoading()">Initiate Transfer</span>
           <div *ngIf="isLoading()" class="spinner"></div>
@@ -119,11 +138,11 @@
         <div class="transfer-details-summary">
           <div class="summary-row">
             <span class="summary-label">Debit Source:</span>
-            <span class="summary-value">{{ sourceAccount()?.holderName }} (ACC-00{{ sourceAccount()?.id }})</span>
+            <span class="summary-value">{{ sourceAccount()?.firstName }} {{ sourceAccount()?.lastName }} ({{ sourceAccount()?.accountNumber }})</span>
           </div>
           <div class="summary-row">
             <span class="summary-label">Credit Destination:</span>
-            <span class="summary-value">Account ID: {{ toAccountId }}</span>
+            <span class="summary-value">Account Number: {{ toAccountNumber }}</span>
           </div>
           <div class="summary-row highlight">
             <span class="summary-label font-bold">Transfer Amount:</span>

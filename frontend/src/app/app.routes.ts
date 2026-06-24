@@ -22,6 +22,21 @@ export const routes: Routes = [
     loadComponent: () => import('./components/history/history').then((m) => m.HistoryComponent),
     canActivate: [authGuard],
   },
+  {
+    path: 'create-account',
+    loadComponent: () => import('./components/create-account/create-account').then((m) => m.CreateAccountComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'profile',
+    loadComponent: () => import('./components/profile/profile').then((m) => m.ProfileComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'rewards',
+    loadComponent: () => import('./components/rewards/rewards').then((m) => m.RewardsComponent),
+    canActivate: [authGuard],
+  },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },
 ];

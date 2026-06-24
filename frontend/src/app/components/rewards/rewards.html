@@ -1,0 +1,204 @@
+<div class="container rewards-wrapper">
+  <!-- Top Header Navigation -->
+  <header class="rewards-header">
+    <button class="btn btn-secondary back-btn" routerLink="/dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Dashboard
+    </button>
+    <h2>Reward Center</h2>
+  </header>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <div class="spinner-large"></div>
+    <p>Loading your rewards balance...</p>
+  </div>
+
+  <!-- Main View -->
+  <div *ngIf="!isLoading()" class="rewards-content">
+    
+    <!-- Balance Card -->
+    <section class="glass-card reward-balance-card">
+      <div class="reward-card-content">
+        <div class="balance-details">
+          <span class="card-label">CURRENT ACTIVE BALANCE</span>
+          <div class="balance-points">
+            <span class="points-value">{{ rewardSummary()?.totalPoints || 0 }}</span>
+            <span class="points-label">Points</span>
+          </div>
+          <p class="balance-description">
+            Earned: {{ rewardSummary()?.totalEarned || 0 }} pts | Redeemed: {{ rewardSummary()?.totalRedeemed || 0 }} pts.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scratch Cards Grid -->
+    <section class="glass-card redeem-section">
+      <div class="card-header">
+        <h3>Redeem Points for Scratch Cards</h3>
+        <p class="section-subtitle" *ngIf="pointsLeftToNextTier > 0">
+          You need <strong>{{ pointsLeftToNextTier }}</strong> more points for the next tier.
+        </p>
+      </div>
+      <div class="scratch-cards-grid">
+        <!-- 500 points Silver Card -->
+        <div class="scratch-card-item silver-tier" [class.locked]="(rewardSummary()?.totalPoints || 0) < 500">
+          <div class="card-glow"></div>
+          <div class="card-inner">
+            <h4>Silver Scratch Card</h4>
+            <p class="card-cost">500 points</p>
+            <p class="card-reward-desc">Win a random reward from brands like Amazon, Starbucks, or Walmart!</p>
+            <button class="btn btn-scratch" (click)="openScratchCardModal(500)" [disabled]="(rewardSummary()?.totalPoints || 0) < 500">
+              {{ (rewardSummary()?.totalPoints || 0) < 500 ? 'Locked' : 'Scratch Now' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 1000 points Gold Card -->
+        <div class="scratch-card-item gold-tier" [class.locked]="(rewardSummary()?.totalPoints || 0) < 1000">
+          <div class="card-glow"></div>
+          <div class="card-inner">
+            <h4>Gold Scratch Card</h4>
+            <p class="card-cost">1000 points</p>
+            <p class="card-reward-desc">Win high-tier rewards from Apple, Netflix, Spotify Premium, and more!</p>
+            <button class="btn btn-scratch" (click)="openScratchCardModal(1000)" [disabled]="(rewardSummary()?.totalPoints || 0) < 1000">
+              {{ (rewardSummary()?.totalPoints || 0) < 1000 ? 'Locked' : 'Scratch Now' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Earnings History Log Table -->
+    <section class="glass-card history-section">
+      <div class="card-header">
+        <h3>Earnings History</h3>
+      </div>
+
+      <div *ngIf="rewardSummary() && rewardSummary()!.history.length > 0; else noRewards" class="table-container">
+        <table class="rewards-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Points</th>
+              <th>From Account</th>
+              <th>To Account</th>
+              <th>Transferred Amount</th>
+              <th>Transaction ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let entry of rewardSummary()!.history">
+              <td class="date-cell">{{ entry.createdAt | date:'medium' }}</td>
+              <td class="points-cell">
+                <span class="points-badge">+{{ entry.pointsEarned }} pts</span>
+              </td>
+              <td>{{ entry.fromAccountNumber }}</td>
+              <td>{{ entry.toAccountNumber }}</td>
+              <td class="amount-cell">Rs. {{ entry.transactionAmount | number:'1.2-2' }}</td>
+              <td class="tx-id-cell">
+                <code class="tx-id-code" [title]="entry.transactionId">{{ entry.transactionId.substring(0, 8) }}...</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Rewards Placeholder -->
+      <ng-template #noRewards>
+        <div class="no-rewards-placeholder">
+          <p class="main-msg">No rewards earned yet</p>
+          <p class="sub-msg">Send money to other users to earn points!</p>
+          <button class="btn btn-primary send-btn" routerLink="/transfer">Send Money Now</button>
+        </div>
+      </ng-template>
+    </section>
+
+    <!-- Claimed Redemptions Log Table -->
+    <section class="glass-card history-section redemptions-history" *ngIf="rewardSummary() && rewardSummary()!.redemptions.length > 0">
+      <div class="card-header">
+        <h3>Claimed Rewards</h3>
+      </div>
+      <div class="table-container">
+        <table class="rewards-table">
+          <thead>
+            <tr>
+              <th>Claimed Date</th>
+              <th>Points Redeemed</th>
+              <th>Revealed Reward</th>
+              <th>Redemption ID</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let red of rewardSummary()!.redemptions">
+              <td class="date-cell">{{ red.createdAt | date:'medium' }}</td>
+              <td class="points-cell">
+                <span class="points-badge-spent">-{{ red.pointsRedeemed }} pts</span>
+              </td>
+              <td class="reward-item-cell">{{ red.rewardItem }}</td>
+              <td class="tx-id-cell">
+                <code class="tx-id-code">RED-{{ red.id }}</code>
+              </td>
+              <td>
+                <span class="status-badge-claimed">Claimed</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Scratch Card Canvas Modal -->
+<div class="modal-overlay" *ngIf="isModalOpen()">
+  <div class="glass-card modal-container">
+    <header class="modal-header">
+      <h4>{{ activeCardTier() }} Points Scratch Card</h4>
+      <button class="btn-close" (click)="closeModal()">×</button>
+    </header>
+    <div class="modal-body">
+      <div class="scratch-area-wrapper">
+        <!-- Beneath/Revealed State -->
+        <div class="revealed-reward-content" [class.visible]="hasScratchedEnough()">
+          <div class="prize-info" *ngIf="revealedPrize(); else loadingPrize">
+            <span class="congrats-label">CONGRATULATIONS!</span>
+            <h3 class="prize-title">{{ revealedPrize() }}</h3>
+            <p class="prize-desc">This voucher has been successfully claimed and saved to your history.</p>
+          </div>
+          <ng-template #loadingPrize>
+            <div class="prize-loading-spinner">
+              <div class="spinner-small"></div>
+              <p>Revealing and claiming prize...</p>
+            </div>
+          </ng-template>
+        </div>
+
+        <!-- Canvas Scratch Layer -->
+        <canvas #scratchCanvas 
+                *ngIf="!hasScratchedEnough()"
+                (mousedown)="onMouseDown($event)"
+                (mousemove)="onMouseMove($event)"
+                (mouseup)="onMouseUp()"
+                (mouseleave)="onMouseUp()"
+                (touchstart)="onTouchStart($event)"
+                (touchmove)="onTouchMove($event)"
+                (touchend)="onTouchEnd()"
+                class="scratch-canvas">
+        </canvas>
+      </div>
+      <p class="scratch-instructions" *ngIf="!hasScratchedEnough()">
+        Move your cursor/finger over the card to scratch and reveal! ({{ scratchPercentage() }}% cleared)
+      </p>
+      <button class="btn btn-secondary modal-action-btn" (click)="closeModal()" *ngIf="hasScratchedEnough() && revealedPrize()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

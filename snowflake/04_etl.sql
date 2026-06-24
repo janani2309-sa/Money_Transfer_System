@@ -6,7 +6,9 @@ USE SCHEMA ANALYTICS;
 -- 1. Create Staging Tables for Raw Data
 CREATE OR REPLACE TEMPORARY TABLE STG_ACCOUNTS (
     id NUMBER,
-    holder_name VARCHAR(255),
+    account_number VARCHAR(36),
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
     balance DECIMAL(18,2),
     status VARCHAR(20),
     version NUMBER,
@@ -38,10 +40,12 @@ COPY INTO STG_TRANSACTION_LOGS
 
 -- 3. Populate DIM_ACCOUNT from Staging Data
 -- Insert new accounts or updates (simple insert for progressive build demo)
-INSERT INTO DIM_ACCOUNT (account_id, holder_name, status, effective_date)
+INSERT INTO DIM_ACCOUNT (account_id, account_number, first_name, last_name, status, effective_date)
 SELECT 
     id,
-    holder_name,
+    account_number,
+    first_name,
+    last_name,
     status,
     last_updated::DATE
 FROM STG_ACCOUNTS

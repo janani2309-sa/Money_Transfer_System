@@ -6,8 +6,8 @@ import { AccountService } from '../../services/account.service';
 
 export interface TransactionRecord {
   id: string;
-  fromAccountId: number;
-  toAccountId: number;
+  fromAccountNumber: string;
+  toAccountNumber: string;
   amount: number;
   status: string;
   failureReason: string | null;
@@ -24,8 +24,9 @@ export interface TransactionRecord {
 })
 export class HistoryComponent implements OnInit {
   transactions = signal<TransactionRecord[]>([]);
-  currentAccountId = signal<number | null>(null);
+  currentAccountNumber = signal<string | null>(null);
   isLoading = signal<boolean>(true);
+  isDownloading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
 
   constructor(
@@ -34,22 +35,49 @@ export class HistoryComponent implements OnInit {
     private router: Router
   ) {}
 
+  downloadPdf(): void {
+    const accountNumber = this.currentAccountNumber();
+    if (!accountNumber) {
+      return;
+    }
+
+    this.isDownloading.set(true);
+    this.errorMessage.set(null);
+
+    this.accountService.downloadStatementPdf(accountNumber).subscribe({
+      next: (blob: Blob) => {
+        this.isDownloading.set(false);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `statement-${accountNumber}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        this.isDownloading.set(false);
+        this.errorMessage.set('Failed to download statement. Please try again.');
+        console.error(err);
+      },
+    });
+  }
+
   ngOnInit(): void {
-    const accountId = this.authService.currentAccountId();
-    if (!accountId) {
+    const accountNumber = this.authService.currentAccountNumber();
+    if (!accountNumber) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.currentAccountId.set(accountId);
-    this.fetchTransactions(accountId);
+    this.currentAccountNumber.set(accountNumber);
+    this.fetchTransactions(accountNumber);
   }
 
-  fetchTransactions(id: number): void {
+  fetchTransactions(accountNumber: string): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.accountService.getTransactions(id).subscribe({
+    this.accountService.getTransactions(accountNumber).subscribe({
       next: (data: TransactionRecord[]) => {
         this.transactions.set(data);
         this.isLoading.set(false);
@@ -63,6 +91,6 @@ export class HistoryComponent implements OnInit {
   }
 
   isDebit(tx: TransactionRecord): boolean {
-    return tx.fromAccountId === this.currentAccountId();
+    return tx.fromAccountNumber === this.currentAccountNumber();
   }
 }

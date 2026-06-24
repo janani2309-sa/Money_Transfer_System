@@ -59,3 +59,5 @@ yarn-error.log*
 .env.production.local
 application-local.properties
 application-local.yml
+backend/src/main/resources/application.yml
+backend/src/test/resources/application.yml

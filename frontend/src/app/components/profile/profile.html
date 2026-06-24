@@ -1,0 +1,171 @@
+<div class="container profile-wrapper">
+  <!-- Header / Navigation -->
+  <header class="profile-header">
+    <button class="btn btn-secondary back-btn" routerLink="/dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Dashboard
+    </button>
+    <h2>User Profile</h2>
+  </header>
+
+  <!-- Main Grid Layout -->
+  <div class="grid-layout">
+    <!-- Left Column: Personal Information -->
+    <div class="glass-card personal-info-card">
+      <div class="card-header">
+        <h3>Personal Information</h3>
+      </div>
+      <div class="profile-avatar-box">
+        <div class="avatar-circle">
+          {{ userProfile()?.firstName?.substring(0,1) }}{{ userProfile()?.lastName?.substring(0,1) }}
+        </div>
+        <h4>{{ userProfile()?.firstName }} {{ userProfile()?.lastName }}</h4>
+        <span class="user-handle">@{{ userProfile()?.username }}</span>
+      </div>
+
+      <div class="details-list">
+        <div class="detail-item">
+          <label>Email Address</label>
+          <span class="detail-val">{{ userProfile()?.email }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Phone Number</label>
+          <span class="detail-val">{{ userProfile()?.phoneNumber }}</span>
+        </div>
+      </div>
+
+      <!-- Delete Profile -->
+      <div class="danger-zone">
+        <h4>Delete Profile</h4>
+        <p class="danger-desc">Anonymize and permanently delete your user profile and associated bank accounts.</p>
+        <button class="btn btn-danger-outline" (click)="openDeleteProfileModal()" [disabled]="isLoading()">
+          Confirm Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Column: Linked Bank Accounts -->
+    <div class="glass-card accounts-list-card">
+      <div class="card-header">
+        <h3>Bank Accounts</h3>
+      </div>
+
+      <div class="accounts-grid" *ngIf="userProfile()?.accounts?.length > 0; else noAccounts">
+        <div *ngFor="let acc of userProfile()?.accounts" class="account-card-item"
+          [class.closed]="acc.status === 'CLOSED'">
+          <div class="acc-card-header">
+            <span class="acc-type-badge">{{ acc.accountType }}</span>
+            <span class="badge" [class.badge-success]="acc.status === 'ACTIVE'"
+              [class.badge-danger]="acc.status === 'CLOSED'">
+              {{ acc.status }}
+            </span>
+          </div>
+          <div class="acc-card-body">
+            <div class="acc-num-label">Account Number</div>
+            <div class="acc-num-val">{{ acc.accountNumber }}</div>
+
+            <div class="acc-bal-label" *ngIf="acc.status !== 'CLOSED'">Balance</div>
+            <div class="acc-bal-val text-indigo" *ngIf="acc.status !== 'CLOSED'">
+              Rs. {{ acc.balance | number:'1.2-2' }}
+            </div>
+
+            <!-- Closed Account Reason display -->
+            <div class="closure-reason-box" *ngIf="acc.status === 'CLOSED' && acc.closureReason">
+              <label>Reason Closed</label>
+              <p>{{ acc.closureReason }}</p>
+            </div>
+          </div>
+          <div class="acc-card-footer" *ngIf="acc.status === 'ACTIVE'">
+            <button class="btn btn-secondary close-acc-btn"
+              (click)="openCloseAccountModal(acc.accountNumber, acc.balance)">
+              Close Account
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noAccounts>
+        <div class="no-accounts-placeholder">
+          <p>You currently do not have any linked accounts.</p>
+          <button class="btn btn-primary" routerLink="/create-account">Open Account</button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Modal 1: Close Account -->
+  <div class="modal-overlay" *ngIf="showCloseModal()">
+    <div class="glass-card modal-card">
+      <div class="modal-header">
+        <h3>Close Account</h3>
+      </div>
+      <form (ngSubmit)="submitAccountClosure()">
+        <div class="modal-body">
+          <p>Please select a reason for closing the bank account <strong>{{ accountToClose }}</strong>:</p>
+
+          <div class="form-group">
+            <label for="closureReasonType">REASON TYPE</label>
+            <select id="closureReasonType" name="closureReasonType" class="input-field select-field"
+              [(ngModel)]="closureReasonType" required>
+              <option value="NO_LONGER_NEEDED">No longer needed</option>
+              <option value="HIGH_FEES">Fees are too high</option>
+              <option value="POOR_SUPPORT">Poor customer service</option>
+              <option value="OTHER">Other (Please specify)</option>
+            </select>
+          </div>
+
+          <div class="form-group" *ngIf="closureReasonType === 'OTHER'">
+            <label for="customClosureReason">SPECIFY REASON</label>
+            <input type="text" id="customClosureReason" name="customClosureReason" class="input-field"
+              placeholder="Type your closure reason here..." [(ngModel)]="customClosureReason" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeCloseModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Confirm Closure</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Delete Profile -->
+  <div class="modal-overlay" *ngIf="showDeleteModal()">
+    <div class="glass-card modal-card danger">
+      <div class="modal-header">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" class="danger-icon">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <h3>Permanent Deletion Warning</h3>
+      </div>
+      <div class="modal-body">
+        <p class="warning-text">
+          Are you absolutely sure you want to delete your profile? This action will:
+        </p>
+        <ul class="warning-list">
+          <li>Close all of your active bank accounts.</li>
+          <li>Anonymize all of your personal identity details.</li>
+          <li>Prevent you from ever logging in with this profile again.</li>
+        </ul>
+        <p>To confirm deletion, please type your username (<strong>{{ userProfile()?.username }}</strong>) in the box below:</p>
+
+        <div class="form-group">
+          <input type="text" id="deleteConfirmInput" name="deleteConfirmInput" class="input-field delete-input"
+            [placeholder]="'Type ' + (userProfile()?.username || 'username')" [(ngModel)]="deleteConfirmInput" autocomplete="off" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDeleteModal()">Cancel</button>
+        <button class="btn btn-danger" (click)="submitProfileDeletion()" [disabled]="deleteConfirmInput !== userProfile()?.username">
+          Delete Profile
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

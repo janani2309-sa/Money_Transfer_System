@@ -10,8 +10,21 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/money_transfer_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: Cloud@123$
+    password: YOUR_DATABASE_PASSWORD_HERE
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: YOUR_GMAIL_USERNAME_HERE
+    password: YOUR_GMAIL_APP_PASSWORD_HERE
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
   jpa:
     hibernate:
@@ -24,4 +37,4 @@ spring:
 
   sql:
     init:
-      mode: never # We will manage the DDL and DML scripts manually or via Hibernate
+      mode: never

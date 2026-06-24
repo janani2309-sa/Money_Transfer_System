@@ -2,15 +2,21 @@
   <!-- Top Navigation Header -->
   <header class="dashboard-header glass-card">
     <div class="brand">
-      <svg class="header-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-      </svg>
-      <span class="brand-text">4You Bank</span>
+      <img class="header-logo" src="/apexpay_logo.png" alt="ApexPay Logo" />
+      <span class="brand-text">ApexPay</span>
     </div>
     <div class="user-actions">
-      <span class="welcome-user" *ngIf="account()">Welcome, <strong>{{ account()?.holderName }}</strong></span>
+      <span class="welcome-user" *ngIf="userProfile()">Welcome, <strong>{{ userProfile()?.firstName }} {{ userProfile()?.lastName }}</strong></span>
+      <a class="btn btn-secondary rewards-btn" routerLink="/rewards" style="margin-right: 0.5rem; border-color: rgba(255, 215, 0, 0.4); color: #ffd700;">
+        Rewards
+      </a>
+      <a class="btn btn-secondary profile-btn" routerLink="/profile" style="margin-right: 0.5rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Profile
+      </a>
       <button class="btn btn-secondary logout-btn" (click)="logout()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -22,15 +28,7 @@
     </div>
   </header>
 
-  <!-- Error Alerts -->
-  <div *ngIf="errorMessage()" class="alert alert-danger">
-    <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"></circle>
-      <line x1="12" y1="8" x2="12" y2="12"></line>
-      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-    </svg>
-    <span>{{ errorMessage() }}</span>
-  </div>
+
 
   <!-- Loading State -->
   <div *ngIf="isLoading()" class="loading-container">
@@ -39,29 +37,69 @@
   </div>
 
   <!-- Main Content -->
-  <main class="dashboard-content" *ngIf="!isLoading() && account()">
+  <main class="dashboard-content" *ngIf="!isLoading() && activeAccount()">
+    <!-- Linked Accounts Selection Bar -->
+    <section class="accounts-selector-section">
+      <h3 class="section-title">Your Bank Accounts</h3>
+      <div class="accounts-tabs-container">
+        <div 
+          *ngFor="let acc of userProfile()?.accounts"
+          class="account-tab-card glass-card"
+          [class.active]="acc.accountNumber === activeAccount()?.accountNumber"
+          (click)="switchAccount(acc.accountNumber)"
+        >
+          <div class="tab-card-header">
+            <span class="account-type-badge">{{ acc.accountType }}</span>
+            <span class="active-dot" *ngIf="acc.accountNumber === activeAccount()?.accountNumber"></span>
+          </div>
+          <span class="tab-acc-number">{{ acc.accountNumber }}</span>
+          <span class="tab-balance">Rs. {{ acc.balance | number:'1.2-2' }}</span>
+        </div>
+
+        <!-- Open Account Button Option -->
+        <div 
+          *ngIf="hasFewerThanThreeAccounts()"
+          class="account-tab-card open-new-account-card glass-card"
+          routerLink="/create-account"
+        >
+          <div class="plus-icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </div>
+          <span class="open-card-title">Open Account</span>
+          <span class="open-card-desc">Add savings, business, or salary</span>
+        </div>
+      </div>
+    </section>
+
     <div class="grid-layout">
       <!-- Balance Card -->
       <section class="glass-card balance-card">
         <div class="balance-header">
-          <span class="card-label">AVAILABLE BALANCE</span>
+          <span class="card-label">AVAILABLE BALANCE ({{ activeAccount()?.accountType }})</span>
           <span class="badge" [ngClass]="{
-            'badge-success': account()?.status === 'ACTIVE',
-            'badge-danger': account()?.status !== 'ACTIVE'
-          }">{{ account()?.status }}</span>
+            'badge-success': activeAccount()?.status === 'ACTIVE',
+            'badge-danger': activeAccount()?.status !== 'ACTIVE'
+          }">{{ activeAccount()?.status }}</span>
         </div>
         <div class="balance-value">
           <span class="currency-symbol">Rs.</span>
-          <span class="amount-whole">{{ account()?.balance | number:'1.2-2' }}</span>
+          <span class="amount-whole">{{ activeAccount()?.balance | number:'1.2-2' }}</span>
         </div>
         <div class="account-meta">
           <div class="meta-item">
             <span class="meta-label">Account Number</span>
-            <span class="meta-value">ACC-00{{ account()?.id }}</span>
+            <span class="meta-value">{{ activeAccount()?.accountNumber }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Account Opened</span>
+            <span class="meta-value">{{ activeAccount()?.openedDate | date:'mediumDate' }}</span>
           </div>
           <div class="meta-item">
             <span class="meta-label">Last Updated</span>
-            <span class="meta-value">{{ account()?.lastUpdated | date:'medium' }}</span>
+            <span class="meta-value">{{ activeAccount()?.lastUpdated | date:'medium' }}</span>
           </div>
         </div>
       </section>
@@ -100,6 +138,18 @@
           <div class="action-details">
             <h3>Transaction Logs</h3>
             <p>Monitor your statement history and transfer audit trail.</p>
+          </div>
+          <div class="action-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <div class="action-card glass-card" routerLink="/rewards" style="border-color: rgba(255, 215, 0, 0.25);">
+          <div class="action-details">
+            <h3>Reward Center</h3>
+            <p>View your earned points, eligibility criteria, and transfer rewards.</p>
           </div>
           <div class="action-arrow">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

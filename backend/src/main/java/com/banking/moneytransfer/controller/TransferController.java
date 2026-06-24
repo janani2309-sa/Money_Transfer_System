@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/transfers")
-@CrossOrigin(origins = "*") // Allow frontend integration
+@CrossOrigin(origins = "*")
 public class TransferController {
 
     private final TransferService transferService;

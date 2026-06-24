@@ -2,14 +2,26 @@
   <div class="glass-card login-card">
     <div class="brand">
       <div class="logo-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-        </svg>
+        <img src="/apexpay_logo.png" alt="ApexPay Logo" class="brand-logo-img" />
       </div>
-      <h2>4You Bank</h2>
+      <h2>ApexPay</h2>
       <p class="subtitle">Secure Enterprise Money Transfer</p>
+    </div>
+
+    <!-- Tab Switcher (Hide during OTP verification) -->
+    <div class="auth-tabs" *ngIf="!isOtpVerification">
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="!isSignUp" 
+        (click)="toggleMode(false)"
+      >Sign In</button>
+      <button 
+        type="button" 
+        class="tab-btn" 
+        [class.active]="isSignUp" 
+        (click)="toggleMode(true)"
+      >Sign Up</button>
     </div>
 
     <!-- Error message alert -->
@@ -22,15 +34,16 @@
       <span>{{ errorMessage() }}</span>
     </div>
 
-    <form (ngSubmit)="onSubmit()" #loginForm="ngForm" autocomplete="off">
+    <!-- 1. SIGN IN FORM -->
+    <form *ngIf="!isSignUp && !isOtpVerification" (ngSubmit)="onSubmitLogin()" #loginForm="ngForm" autocomplete="off">
       <div class="form-group">
-        <label for="username">ACCOUNT ID / USERNAME</label>
+        <label for="username">USERNAME / ACCOUNT NUMBER</label>
         <input
           type="text"
           id="username"
           name="username"
           class="input-field"
-          placeholder="e.g. janani, admin, or Account ID"
+          placeholder="e.g. janani, admin, or Account Number"
           [(ngModel)]="username"
           required
           pattern="^[a-zA-Z0-9]+$"
@@ -39,7 +52,7 @@
         />
         <div *ngIf="usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)" class="validation-error">
           <span *ngIf="usernameInput.errors?.['required']">Username is required.</span>
-          <span *ngIf="usernameInput.errors?.['pattern']">Username must be alphanumeric with no special characters.</span>
+          <span *ngIf="usernameInput.errors?.['pattern']">Username must be alphanumeric.</span>
         </div>
       </div>
 
@@ -53,13 +66,11 @@
           placeholder="••••••••"
           [(ngModel)]="password"
           required
-          pattern="^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]{8,15}$"
           #passwordInput="ngModel"
           [disabled]="isLoading()"
         />
         <div *ngIf="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)" class="validation-error">
           <span *ngIf="passwordInput.errors?.['required']">Password is required.</span>
-          <span *ngIf="passwordInput.errors?.['pattern']">Password must contain alphanumeric/special characters and be between 8 and 15 characters.</span>
         </div>
       </div>
 
@@ -73,12 +84,198 @@
       </button>
     </form>
 
-    <div class="creds-help">
-      <p>💡 <strong>Demo Credentials:</strong></p>
-      <ul>
-        <li>User: <code>janani</code> / Pass: <code>Janani23092004</code> (Account ID: 1)</li>
-        <li>Admin: <code>admin</code> / Pass: <code>admin123</code> (Account ID: 3)</li>
-      </ul>
+    <!-- 2. SIGN UP FORM -->
+    <form *ngIf="isSignUp && !isOtpVerification" (ngSubmit)="onSubmitSignUp()" #signUpForm="ngForm" autocomplete="off">
+      <div class="row">
+        <div class="form-group col">
+          <label for="signUpFirstName">FIRST NAME</label>
+          <input
+            type="text"
+            id="signUpFirstName"
+            name="signUpFirstName"
+            class="input-field"
+            placeholder="John"
+            [(ngModel)]="signUpData.firstName"
+            required
+            #firstNameInput="ngModel"
+            [disabled]="isLoading()"
+          />
+        </div>
+        <div class="form-group col">
+          <label for="signUpLastName">LAST NAME</label>
+          <input
+            type="text"
+            id="signUpLastName"
+            name="signUpLastName"
+            class="input-field"
+            placeholder="Smith"
+            [(ngModel)]="signUpData.lastName"
+            required
+            #lastNameInput="ngModel"
+            [disabled]="isLoading()"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="signUpEmail">EMAIL ADDRESS</label>
+        <input
+          type="email"
+          id="signUpEmail"
+          name="signUpEmail"
+          class="input-field"
+          placeholder="john.smith@gmail.com"
+          [(ngModel)]="signUpData.email"
+          required
+          email
+          #emailInput="ngModel"
+          [disabled]="isLoading()"
+        />
+        <div *ngIf="emailInput.invalid && (emailInput.dirty || emailInput.touched)" class="validation-error">
+          <span *ngIf="emailInput.errors?.['required']">Email is required.</span>
+          <span *ngIf="emailInput.errors?.['email']">Invalid email format.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="signUpPhone">PHONE NUMBER</label>
+        <input
+          type="text"
+          id="signUpPhone"
+          name="signUpPhone"
+          class="input-field"
+          placeholder="e.g. 9876543210"
+          [(ngModel)]="signUpData.phoneNumber"
+          required
+          pattern="^[0-9]{10}$"
+          maxlength="10"
+          #phoneInput="ngModel"
+          [disabled]="isLoading()"
+        />
+        <div *ngIf="phoneInput.invalid && (phoneInput.dirty || phoneInput.touched)" class="validation-error">
+          <span *ngIf="phoneInput.errors?.['required']">Phone number is required.</span>
+          <span *ngIf="phoneInput.errors?.['pattern']">Phone number must be exactly 10 digits.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="signUpUsername">CHOOSE USERNAME</label>
+        <input
+          type="text"
+          id="signUpUsername"
+          name="signUpUsername"
+          class="input-field"
+          placeholder="alphanumeric only"
+          [(ngModel)]="signUpData.username"
+          required
+          pattern="^[a-zA-Z0-9]{3,50}$"
+          #signUpUsernameInput="ngModel"
+          [disabled]="isLoading()"
+        />
+        <div *ngIf="signUpUsernameInput.invalid && (signUpUsernameInput.dirty || signUpUsernameInput.touched)" class="validation-error">
+          <span *ngIf="signUpUsernameInput.errors?.['required']">Username is required.</span>
+          <span *ngIf="signUpUsernameInput.errors?.['pattern']">Username must be between 3 and 50 alphanumeric characters.</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="form-group col">
+          <label for="signUpPassword">PASSWORD</label>
+          <input
+            type="password"
+            id="signUpPassword"
+            name="signUpPassword"
+            class="input-field"
+            placeholder="••••••••"
+            [(ngModel)]="signUpData.password"
+            required
+            pattern="^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]{8,15}$"
+            #signUpPasswordInput="ngModel"
+            [disabled]="isLoading()"
+          />
+        </div>
+        <div class="form-group col">
+          <label for="signUpConfirmPassword">CONFIRM</label>
+          <input
+            type="password"
+            id="signUpConfirmPassword"
+            name="signUpConfirmPassword"
+            class="input-field"
+            placeholder="••••••••"
+            [(ngModel)]="signUpData.confirmPassword"
+            required
+            [disabled]="isLoading()"
+          />
+        </div>
+      </div>
+      <div *ngIf="signUpPasswordInput.invalid && (signUpPasswordInput.dirty || signUpPasswordInput.touched)" class="validation-error" style="margin-top: -0.5rem; margin-bottom: 1rem;">
+        <span>Must be between 8 and 15 characters (alphanumeric/special).</span>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary login-btn"
+        [disabled]="signUpForm.invalid || isLoading()"
+      >
+        <span *ngIf="!isLoading()">Register & Send OTP</span>
+        <div *ngIf="isLoading()" class="spinner"></div>
+      </button>
+    </form>
+
+    <!-- 3. OTP VERIFICATION VIEW -->
+    <div *ngIf="isOtpVerification" class="otp-verification-container">
+      <p class="verification-desc">
+        Please enter the 6-digit verification code sent to your Gmail/Phone.
+      </p>
+
+      <form (ngSubmit)="onSubmitVerifyOtp()" #otpForm="ngForm" autocomplete="off">
+        <div class="form-group">
+          <label for="otpCode">ENTER 6-DIGIT VERIFICATION CODE</label>
+          <input
+            type="text"
+            id="otpCode"
+            name="otpCode"
+            class="input-field otp-input"
+            placeholder="e.g. 123456"
+            [(ngModel)]="otpCode"
+            required
+            pattern="^\d{6}$"
+            maxlength="6"
+            #otpInput="ngModel"
+            [disabled]="isLoading()"
+          />
+          <div *ngIf="otpInput.invalid && (otpInput.dirty || otpInput.touched)" class="validation-error">
+            <span>OTP code must be exactly 6 digits.</span>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary login-btn"
+          [disabled]="otpForm.invalid || isLoading()"
+        >
+          <span *ngIf="!isLoading()">Verify OTP & Open Account</span>
+          <div *ngIf="isLoading()" class="spinner"></div>
+        </button>
+
+        <div class="otp-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary resend-btn" 
+            (click)="onResendOtp()"
+            [disabled]="isLoading()"
+          >Resend Code</button>
+          
+          <button 
+            type="button" 
+            class="btn btn-secondary cancel-btn" 
+            (click)="toggleMode(false)"
+            [disabled]="isLoading()"
+          >Back to Sign In</button>
+        </div>
+      </form>
     </div>
+
+
   </div>
 </div>

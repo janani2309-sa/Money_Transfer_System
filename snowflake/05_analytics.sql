@@ -16,14 +16,15 @@ ORDER BY d.full_date DESC;
 
 -- Query 2: Account Activity (Identify most active accounts based on transactions sent/received)
 SELECT 
-    da.holder_name,
-    da.account_id,
+    da.first_name,
+    da.last_name,
+    da.account_number,
     COUNT(f.transaction_key) as total_activities,
     SUM(CASE WHEN f.account_from_key = da.account_key THEN f.amount ELSE 0 END) as total_sent,
     SUM(CASE WHEN f.account_to_key = da.account_key THEN f.amount ELSE 0 END) as total_received
 FROM FACT_TRANSACTIONS f
 JOIN DIM_ACCOUNT da ON f.account_from_key = da.account_key OR f.account_to_key = da.account_key
-GROUP BY da.holder_name, da.account_id
+GROUP BY da.first_name, da.last_name, da.account_number
 ORDER BY total_activities DESC
 LIMIT 10;
 

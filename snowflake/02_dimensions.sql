@@ -7,7 +7,9 @@ USE SCHEMA ANALYTICS;
 CREATE OR REPLACE TABLE DIM_ACCOUNT (
     account_key NUMBER IDENTITY(1,1) PRIMARY KEY,
     account_id NUMBER NOT NULL,
-    holder_name VARCHAR(255) NOT NULL,
+    account_number VARCHAR(36) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
     status VARCHAR(20) NOT NULL,
     effective_date DATE DEFAULT CURRENT_DATE()
 );

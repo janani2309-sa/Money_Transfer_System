@@ -1,14 +1,26 @@
 <div class="container history-wrapper">
   <!-- Header / Navigation -->
   <header class="history-header">
-    <button class="btn btn-secondary back-btn" routerLink="/dashboard">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
-        <line x1="19" y1="12" x2="5" y2="12"></line>
-        <polyline points="12 19 5 12 12 5"></polyline>
+    <div class="history-header-left">
+      <button class="btn btn-secondary back-btn" routerLink="/dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Dashboard
+      </button>
+      <h2>Transaction History</h2>
+    </div>
+
+    <button class="btn btn-primary download-btn" (click)="downloadPdf()" [disabled]="isLoading() || isDownloading() || transactions().length === 0">
+      <svg *ngIf="!isDownloading()" class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
       </svg>
-      Dashboard
+      <div *ngIf="isDownloading()" class="spinner-small"></div>
+      <span>{{ isDownloading() ? 'Downloading...' : 'Download PDF' }}</span>
     </button>
-    <h2>Transaction History</h2>
   </header>
 
   <!-- Error Alerts -->
@@ -61,8 +73,8 @@
               <code>{{ tx.id.substring(0, 8) }}...</code>
             </td>
             <td>
-              <span *ngIf="isDebit(tx)">To ACC-00{{ tx.toAccountId }}</span>
-              <span *ngIf="!isDebit(tx)">From ACC-00{{ tx.fromAccountId }}</span>
+              <span *ngIf="isDebit(tx)">To {{ tx.toAccountNumber }}</span>
+              <span *ngIf="!isDebit(tx)">From {{ tx.fromAccountNumber }}</span>
             </td>
             <td>
               <span class="direction-badge" [ngClass]="isDebit(tx) ? 'debit' : 'credit'">
@@ -80,7 +92,7 @@
                 {{ tx.status }}
               </span>
               <div class="failure-reason-hint" *ngIf="tx.status === 'FAILED' && tx.failureReason">
-                ⚠️ {{ tx.failureReason }}
+                {{ tx.failureReason }}
               </div>
             </td>
           </tr>

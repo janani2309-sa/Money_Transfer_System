@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface TransferRequestData {
-  fromAccountId: number;
-  toAccountId: number;
+  fromAccountNumber: string;
+  toAccountNumber: string;
   amount: number;
   idempotencyKey: string;
 }
